@@ -68,7 +68,7 @@
             </div>
         </div>
 
-        <!-- Panel de Selección de Columnas para Impresión (No se imprime) -->
+        <!-- Panel de Selección de Columnas para Impresión -->
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8 no-print">
             <div class="flex flex-col sm:flex-row justify-between items-center mb-4 pb-2 border-b gap-2">
                 <div>
@@ -91,7 +91,7 @@
             <p id="printMeta" class="text-sm text-slate-600 mb-4"></p>
         </div>
 
-        <!-- Tabla Interactiva de Registros del Censo (Vista Web) -->
+        <!-- Tabla Interactiva de Registros del Censo -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden no-print">
             <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <h3 class="font-bold text-slate-800">Registros del Censo</h3>
@@ -121,11 +121,9 @@
             </div>
         </div>
 
-        <!-- Contenedor exclusivo para Impresión (Tabla dinámica según selección) -->
+        <!-- Contenedor exclusivo para Impresión -->
         <div class="hidden print:block space-y-6">
-            <div id="printReporteGeneralContainer">
-                <!-- Se llena dinámicamente -->
-            </div>
+            <div id="printReporteGeneralContainer"></div>
         </div>
     </main>
 
@@ -136,9 +134,7 @@
                 <h3 class="text-xl font-bold text-slate-900">Ficha Detallada del Censado</h3>
                 <button onclick="cerrarModalDetalle()" class="text-slate-400 hover:text-slate-600 font-bold text-2xl">&times;</button>
             </div>
-            <div id="contenidoDetalle" class="space-y-3 text-sm text-slate-700">
-                <!-- Se llena dinámicamente -->
-            </div>
+            <div id="contenidoDetalle" class="space-y-3 text-sm text-slate-700"></div>
             <div class="mt-6 flex justify-end gap-3 no-print">
                 <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-medium transition">
                     Imprimir Ficha
@@ -147,6 +143,119 @@
                     Cerrar
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edición de Registro del Censo (Solo Master) -->
+    <div id="modalEditarCenso" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50 no-print">
+        <div class="bg-white rounded-2xl max-w-3xl w-full p-6 max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-xl font-bold text-slate-900">Editar Registro del Censo (Usuario Master)</h3>
+                <button onclick="cerrarModalEditarCenso()" class="text-slate-400 hover:text-slate-600 font-bold text-2xl">&times;</button>
+            </div>
+            <form id="formEditarCenso" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="hidden" id="editCensoId">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Nombre</label>
+                    <input type="text" id="editNombre" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Apellido</label>
+                    <input type="text" id="editApellido" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Cédula de Identidad</label>
+                    <input type="text" id="editCedula" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Teléfono</label>
+                    <input type="text" id="editTelefono" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Fecha de Nacimiento</label>
+                    <input type="date" id="editFechaNacimiento" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Correo Electrónico</label>
+                    <input type="email" id="editCorreo" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Profesión</label>
+                    <input type="text" id="editProfesion" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Nivel Académico</label>
+                    <select id="editNivelAcademico" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="TSU">TSU</option>
+                        <option value="Universitario">Universitario</option>
+                        <option value="Postgrado">Postgrado</option>
+                        <option value="Maestría / Doctorado">Maestría / Doctorado</option>
+                        <option value="Técnico Medio / Oficio">Técnico Medio / Oficio</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Casa de Estudios / Universidad</label>
+                    <input type="text" id="editUniversidad" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Gremio</label>
+                    <input type="text" id="editGremio" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-slate-700">Dirección</label>
+                    <input type="text" id="editDireccion" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Municipio</label>
+                    <select id="editMunicipio" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="Maracaibo">Maracaibo</option>
+                        <option value="San Francisco">San Francisco</option>
+                        <option value="Cabimas">Cabimas</option>
+                        <option value="Lagunillas">Lagunillas</option>
+                        <option value="Valmore Rodríguez">Valmore Rodríguez</option>
+                        <option value="Baralt">Baralt</option>
+                        <option value="Colón">Colón</option>
+                        <option value="Catatumbo">Catatumbo</option>
+                        <option value="Jesús María Semprún">Jesús María Semprún</option>
+                        <option value="Páez (Guajira)">Páez (Guajira)</option>
+                        <option value="Mara">Mara</option>
+                        <option value="Almirante Padilla">Almirante Padilla</option>
+                        <option value="Rosario de Perijá">Rosario de Perijá</option>
+                        <option value="Machiques de Perijá">Machiques de Perijá</option>
+                        <option value="La Cañada de Urdaneta">La Cañada de Urdaneta</option>
+                        <option value="Santa Rita">Santa Rita</option>
+                        <option value="Miranda">Miranda</option>
+                        <option value="Simón Bolívar">Simón Bolívar</option>
+                        <option value="Sucre">Sucre</option>
+                        <option value="Francisco Javier Pulgar">Francisco Javier Pulgar</option>
+                        <option value="Jesús Enrique Lossada">Jesús Enrique Lossada</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Parroquia</label>
+                    <input type="text" id="editParroquia" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Consejo Comunal</label>
+                    <input type="text" id="editConsejoComunal" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Circuito Comunal</label>
+                    <input type="text" id="editCircuitoComunal" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Pertenece a algún movimiento</label>
+                    <input type="text" id="editMovimiento" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-slate-700">Responsabilidad en PYT Zulia</label>
+                    <input type="text" id="editResponsabilidad" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="md:col-span-2 mt-4 flex justify-end gap-3">
+                    <button type="button" onclick="cerrarModalEditarCenso()" class="bg-slate-300 hover:bg-slate-400 text-slate-700 px-4 py-2 rounded-xl text-sm font-medium transition">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl text-sm font-semibold transition">Guardar Cambios</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -268,7 +377,6 @@
 
         let listaCensadosGlobal = [];
 
-        // Definición de campos disponibles para el reporte general
         const camposDisponibles = [
             { id: 'municipio', label: 'Municipio', default: true },
             { id: 'parroquia', label: 'Parroquia', default: true },
@@ -290,7 +398,6 @@
             { id: 'registradoPor', label: 'Registrado Por', default: false }
         ];
 
-        // Inicializar los checkboxes en el panel de configuración
         function inicializarFiltrosImpresion() {
             const contenedor = document.getElementById('contenedorFiltrosImpresion');
             contenedor.innerHTML = "";
@@ -338,7 +445,6 @@
                     listaCensadosGlobal.push({ id: docSnap.id, ...docSnap.data() });
                 });
 
-                // Ordenar alfabéticamente por Municipio
                 listaCensadosGlobal.sort((a, b) => {
                     const muniA = (a.municipio || "").trim().toLowerCase();
                     const muniB = (b.municipio || "").trim().toLowerCase();
@@ -369,6 +475,26 @@
             datos.forEach((data) => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition";
+                
+                // Botones base: Ver detalle siempre disponible
+                let botonesAcciones = `
+                    <button onclick='verDetalle(${JSON.stringify(data)})' class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow transition">
+                        👁️ Ver Detalle
+                    </button>
+                `;
+
+                // Botones de Editar y Eliminar solo para rol regional (Master)
+                if (user.rol === 'regional') {
+                    botonesAcciones += `
+                        <button onclick='abrirEditarCenso(${JSON.stringify(data)})' class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow transition ml-1">
+                            ✏️ Editar
+                        </button>
+                        <button onclick='eliminarCenso("${data.id}")' class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow transition ml-1">
+                            🗑️ Eliminar
+                        </button>
+                    `;
+                }
+
                 tr.innerHTML = `
                     <td class="p-4 font-medium text-slate-900">${data.cedula || 'N/D'}</td>
                     <td class="p-4">${data.nombre} ${data.apellido}</td>
@@ -376,17 +502,14 @@
                     <td class="p-4">${data.municipio}</td>
                     <td class="p-4">${data.parroquia}</td>
                     <td class="p-4">${data.telefono}</td>
-                    <td class="p-4 text-center no-print">
-                        <button onclick='verDetalle(${JSON.stringify(data)})' class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow transition">
-                            👁️ Ver Detalle
-                        </button>
+                    <td class="p-4 text-center no-print whitespace-nowrap">
+                        ${botonesAcciones}
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // Generar tabla de impresión general basada en los checkboxes seleccionados
         function renderizarReporteGeneralImpresion(datos) {
             const container = document.getElementById('printReporteGeneralContainer');
             container.innerHTML = "";
@@ -410,11 +533,7 @@
                 html += `<th class="p-2 border">${campoObj ? campoObj.label : colId}</th>`;
             });
 
-            html += `
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
+            html += `</tr></thead><tbody>`;
 
             if (datos.length === 0) {
                 html += `<tr><td colspan="${checksActivos.length}" class="p-4 text-center text-slate-500">No hay registros disponibles.</td></tr>`;
@@ -436,14 +555,10 @@
                 });
             }
 
-            html += `
-                    </tbody>
-                </table>
-            `;
+            html += `</tbody></table>`;
             container.innerHTML = html;
         }
 
-        // Buscador en tiempo real
         document.getElementById('inputBuscador').addEventListener('input', (e) => {
             const texto = e.target.value.toLowerCase();
             const filtrados = listaCensadosGlobal.filter(item => 
@@ -457,7 +572,6 @@
             renderizarTabla(filtrados);
         });
 
-        // Ver Detalle
         window.verDetalle = function(data) {
             const contenedor = document.getElementById('contenidoDetalle');
             contenedor.innerHTML = `
@@ -489,7 +603,93 @@
             document.getElementById('modalDetalle').classList.add('hidden');
         }
 
-        // Ejecutar inicializaciones
+        // --- Funciones exclusivas del usuario Master (Editar / Eliminar Censo) ---
+        window.abrirEditarCenso = function(data) {
+            document.getElementById('editCensoId').value = data.id;
+            document.getElementById('editNombre').value = data.nombre || '';
+            document.getElementById('editApellido').value = data.apellido || '';
+            document.getElementById('editCedula').value = data.cedula || '';
+            document.getElementById('editTelefono').value = data.telefono || '';
+            document.getElementById('editFechaNacimiento').value = data.fechaNacimiento || '';
+            document.getElementById('editCorreo').value = data.correo || '';
+            document.getElementById('editProfesion').value = data.profesion || '';
+            document.getElementById('editNivelAcademico').value = data.nivelAcademico || 'TSU';
+            document.getElementById('editUniversidad').value = data.universidad || '';
+            document.getElementById('editGremio').value = data.gremio || '';
+            document.getElementById('editDireccion').value = data.direccion || '';
+            document.getElementById('editMunicipio').value = data.municipio || 'Maracaibo';
+            document.getElementById('editParroquia').value = data.parroquia || '';
+            document.getElementById('editConsejoComunal').value = data.consejoComunal || '';
+            document.getElementById('editCircuitoComunal').value = data.circuitoComunal || '';
+            document.getElementById('editMovimiento').value = data.movimiento || '';
+            document.getElementById('editResponsabilidad').value = data.responsabilidad || '';
+
+            document.getElementById('modalEditarCenso').classList.remove('hidden');
+        }
+
+        window.cerrarModalEditarCenso = function() {
+            document.getElementById('modalEditarCenso').classList.add('hidden');
+        }
+
+        document.getElementById('formEditarCenso').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editCensoId').value;
+            if (!id) return;
+
+            const fechaNac = new Date(document.getElementById('editFechaNacimiento').value);
+            const hoy = new Date();
+            let edad = hoy.getFullYear() - fechaNac.getFullYear();
+            const m = hoy.getMonth() - fechaNac.getMonth();
+            if (m < 0 || (m === 0 && hoy.getDate() < fechaNac.getDate())) {
+                edad--;
+            }
+
+            const datosActualizados = {
+                nombre: document.getElementById('editNombre').value.trim(),
+                apellido: document.getElementById('editApellido').value.trim(),
+                cedula: document.getElementById('editCedula').value.trim(),
+                telefono: document.getElementById('editTelefono').value.trim(),
+                fechaNacimiento: document.getElementById('editFechaNacimiento').value,
+                edad: edad,
+                correo: document.getElementById('editCorreo').value.trim(),
+                profesion: document.getElementById('editProfesion').value.trim(),
+                nivelAcademico: document.getElementById('editNivelAcademico').value,
+                universidad: document.getElementById('editUniversidad').value.trim(),
+                gremio: document.getElementById('editGremio').value.trim(),
+                direccion: document.getElementById('editDireccion').value.trim(),
+                municipio: document.getElementById('editMunicipio').value,
+                parroquia: document.getElementById('editParroquia').value.trim(),
+                consejoComunal: document.getElementById('editConsejoComunal').value.trim(),
+                circuitoComunal: document.getElementById('editCircuitoComunal').value.trim(),
+                movimiento: document.getElementById('editMovimiento').value.trim(),
+                responsabilidad: document.getElementById('editResponsabilidad').value.trim()
+            };
+
+            try {
+                await updateDoc(doc(db, "censos_pyt", id), datosActualizados);
+                alert("¡Registro actualizado con éxito!");
+                cerrarModalEditarCenso();
+                cargarDatos();
+            } catch (error) {
+                console.error("Error al actualizar censo:", error);
+                alert("Hubo un error al actualizar el registro.");
+            }
+        });
+
+        window.eliminarCenso = async function(id) {
+            if (confirm("¿Estás seguro de que deseas eliminar este registro del censo? Esta acción no se puede deshacer.")) {
+                try {
+                    await deleteDoc(doc(db, "censos_pyt", id));
+                    alert("¡Registro eliminado con éxito!");
+                    cargarDatos();
+                } catch (error) {
+                    console.error("Error al eliminar censo:", error);
+                    alert("Hubo un error al eliminar el registro.");
+                }
+            }
+        }
+
+        // Inicializar filtros y cargar datos al abrir
         inicializarFiltrosImpresion();
         cargarDatos();
 
@@ -597,5 +797,3 @@
     </script>
 </body>
 </html>
-
-```
