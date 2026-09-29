@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso - PYT Zulia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 flex items-center justify-center min-h-screen px-4">
+    <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
+        <div class="text-center mb-6">
+            <img src="descarga.jpeg" alt="Logo PYT Zulia" class="h-20 mx-auto mb-3 object-contain">
+            <h1 class="text-2xl font-bold text-slate-900">Censo Zulia</h1>
+            <p class="text-sm text-slate-500">Sistema de Profesionales y Técnicos</p>
+        </div>
+
+        <form id="formLogin" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Correo Electrónico</label>
+                <input type="email" id="email" required placeholder="usuario@pytzulia.org" class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Contraseña</label>
+                <input type="password" id="password" required placeholder="••••••••" class="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+            <button type="submit" id="btnIngresar" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition">
+                Iniciar Sesión
+            </button>
+        </form>
+
+        <div id="alerta" class="hidden mt-4 p-3 text-sm text-center bg-red-100 text-red-700 rounded-lg"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVP8spiI6h5JAGc4gT0qGo8t5t9hwn980",
+            authDomain: "censopytzulia.firebaseapp.com",
+            projectId: "censopytzulia",
+            storageBucket: "censopytzulia.firebasestorage.app",
+            messagingSenderId: "130010147895",
+            appId: "1:130010147895:web:f7e626c14b9577cfa1a3b2",
+            measurementId: "G-3P2LN48BWB"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const formLogin = document.getElementById('formLogin');
+        const alerta = document.getElementById('alerta');
+        const btnIngresar = document.getElementById('btnIngresar');
+
+        formLogin.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            btnIngresar.disabled = true;
+            btnIngresar.textContent = "Verificando...";
+            alerta.classList.add('hidden');
+
+            try {
+                const q = query(
+                    collection(db, "usuarios_sistema"), 
+                    where("email", "==", email), 
+                    where("password", "==", password)
+                );
+                
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    const userData = querySnapshot.docs[0].data();
+                    localStorage.setItem('usuario_pyt', JSON.stringify(userData));
+                    window.location.href = "dashboard.html";
+                } else {
+                    alerta.textContent = "Credenciales incorrectas o usuario no registrado.";
+                    alerta.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("Error de acceso:", error);
+                alerta.textContent = "Error al conectar con la base de datos.";
+                alerta.classList.remove('hidden');
+            } finally {
+                btnIngresar.disabled = false;
+                btnIngresar.textContent = "Iniciar Sesión";
+            }
+        });
+    </script>
+</body>
+</html>

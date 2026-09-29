@@ -1,0 +1,314 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas y Gráficos - PYT Zulia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js para los gráficos interactivos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @media print {
+            body { background: white; color: black; }
+            .no-print { display: none !important; }
+            table { font-size: 11px; width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+            th, td { border: 1px solid #cbd5e1; padding: 4px; text-align: left; }
+            .break-page { page-break-inside: avoid; }
+            canvas { max-width: 100% !important; height: 220px !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+    <!-- Barra Superior -->
+    <header class="bg-slate-900 text-white shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <img src="descarga.jpeg" alt="Logo PYT" class="h-10 w-auto bg-white rounded-lg p-1 object-contain">
+                <div>
+                    <h1 class="text-xl font-bold">Módulo de Estadísticas y Gráficos</h1>
+                    <p id="userInfo" class="text-xs text-slate-400">Cargando...</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="dashboard.html" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg text-sm font-semibold transition">
+                    ← Volver al Panel
+                </a>
+                <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-semibold transition">
+                    🖨️ Imprimir Reporte
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+        <!-- Encabezado para Impresión -->
+        <div class="hidden print:block mb-4">
+            <h2 class="text-2xl font-bold">Reporte Estadístico y Gráfico Oficial - PYT Zulia</h2>
+            <p id="printMeta" class="text-sm text-slate-600"></p>
+        </div>
+
+        <!-- Tarjeta Resumen Total -->
+        <div class="bg-gradient-to-r from-blue-900 to-slate-900 text-white p-6 rounded-2xl shadow-sm flex justify-between items-center">
+            <div>
+                <p class="text-sm text-slate-300 font-medium">Total de Registros Analizados</p>
+                <p id="totalGeneral" class="text-4xl font-extrabold mt-1">0</p>
+            </div>
+            <button onclick="window.print()" class="no-print bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl text-sm font-semibold transition border border-white/20">
+                Imprimir Reporte Completo
+            </button>
+        </div>
+
+        <!-- Grid de Secciones Estadísticas (Gráfico + Tabla) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- 1. Por Municipio -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 break-page space-y-4">
+                <h3 class="font-bold text-slate-800 text-lg border-b pb-2">📍 Censados por Municipio</h3>
+                <div class="relative h-64 flex items-center justify-center">
+                    <canvas id="chartMunicipio"></canvas>
+                </div>
+                <div class="overflow-x-auto max-h-40 overflow-y-auto border rounded-xl">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead class="bg-slate-50 text-slate-600 uppercase sticky top-0">
+                            <tr><th class="p-2">Municipio</th><th class="p-2 text-right">Cant.</th></tr>
+                        </thead>
+                        <tbody id="tablaMunicipio" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2. Por Parroquia -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 break-page space-y-4">
+                <h3 class="font-bold text-slate-800 text-lg border-b pb-2">📍 Censados por Parroquia</h3>
+                <div class="relative h-64 flex items-center justify-center">
+                    <canvas id="chartParroquia"></canvas>
+                </div>
+                <div class="overflow-x-auto max-h-40 overflow-y-auto border rounded-xl">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead class="bg-slate-50 text-slate-600 uppercase sticky top-0">
+                            <tr><th class="p-2">Parroquia</th><th class="p-2 text-right">Cant.</th></tr>
+                        </thead>
+                        <tbody id="tablaParroquia" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. Por Consejo Comunal -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 break-page space-y-4">
+                <h3 class="font-bold text-slate-800 text-lg border-b pb-2">🏘️ Censados por Consejo Comunal</h3>
+                <div class="relative h-64 flex items-center justify-center">
+                    <canvas id="chartConsejoComunal"></canvas>
+                </div>
+                <div class="overflow-x-auto max-h-40 overflow-y-auto border rounded-xl">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead class="bg-slate-50 text-slate-600 uppercase sticky top-0">
+                            <tr><th class="p-2">Consejo Comunal</th><th class="p-2 text-right">Cant.</th></tr>
+                        </thead>
+                        <tbody id="tablaConsejoComunal" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 4. Por Circuito Comunal -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 break-page space-y-4">
+                <h3 class="font-bold text-slate-800 text-lg border-b pb-2">🔗 Censados por Circuito Comunal</h3>
+                <div class="relative h-64 flex items-center justify-center">
+                    <canvas id="chartCircuitoComunal"></canvas>
+                </div>
+                <div class="overflow-x-auto max-h-40 overflow-y-auto border rounded-xl">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead class="bg-slate-50 text-slate-600 uppercase sticky top-0">
+                            <tr><th class="p-2">Circuito Comunal</th><th class="p-2 text-right">Cant.</th></tr>
+                        </thead>
+                        <tbody id="tablaCircuitoComunal" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5. Por Profesión -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 break-page space-y-4">
+                <h3 class="font-bold text-slate-800 text-lg border-b pb-2">💼 Censados por Profesión</h3>
+                <div class="relative h-64 flex items-center justify-center">
+                    <canvas id="chartProfesion"></canvas>
+                </div>
+                <div class="overflow-x-auto max-h-40 overflow-y-auto border rounded-xl">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead class="bg-slate-50 text-slate-600 uppercase sticky top-0">
+                            <tr><th class="p-2">Profesión</th><th class="p-2 text-right">Cant.</th></tr>
+                        </thead>
+                        <tbody id="tablaProfesion" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 6. Por Rango de Edad -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 break-page space-y-4">
+                <h3 class="font-bold text-slate-800 text-lg border-b pb-2">🎂 Distribución por Rango de Edad</h3>
+                <div class="relative h-64 flex items-center justify-center">
+                    <canvas id="chartEdad"></canvas>
+                </div>
+                <div class="overflow-x-auto max-h-40 overflow-y-auto border rounded-xl">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead class="bg-slate-50 text-slate-600 uppercase sticky top-0">
+                            <tr><th class="p-2">Rango de Edad</th><th class="p-2 text-right">Cant.</th></tr>
+                        </thead>
+                        <tbody id="tablaEdad" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Script de Estadísticas y Renderizado de Gráficos -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVP8spiI6h5JAGc4gT0qGo8t5t9hwn980",
+            authDomain: "censopytzulia.firebaseapp.com",
+            projectId: "censopytzulia",
+            storageBucket: "censopytzulia.firebasestorage.app",
+            messagingSenderId: "130010147895",
+            appId: "1:130010147895:web:f7e626c14b9577cfa1a3b2",
+            measurementId: "G-3P2LN48BWB"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const user = JSON.parse(localStorage.getItem('usuario_pyt'));
+        if (!user) {
+            window.location.href = "index.html";
+        }
+
+        document.getElementById('userInfo').textContent = `${user.nombre} (${user.rol.toUpperCase()}) - Zona: ${user.rol === 'regional' ? 'Estado Zulia' : user.municipio}`;
+        document.getElementById('printMeta').textContent = `Generado por: ${user.email} | Zona: ${user.rol === 'regional' ? 'Todo el Estado Zulia' : user.municipio}`;
+
+        async function calcularEstadisticas() {
+            try {
+                let q;
+                if (user.rol === 'regional') {
+                    q = collection(db, "censos_pyt");
+                } else {
+                    q = query(collection(db, "censos_pyt"), where("municipio", "==", user.municipio));
+                }
+
+                const querySnapshot = await getDocs(q);
+                let total = 0;
+
+                const contadoresMunicipio = {};
+                const contadoresParroquia = {};
+                const contadoresConsejo = {};
+                const contadoresCircuito = {};
+                const contadoresProfesion = {};
+                const contadoresEdad = { "18-29 años": 0, "30-44 años": 0, "45-59 años": 0, "60+ años": 0, "No especificada": 0 };
+
+                querySnapshot.forEach((docSnap) => {
+                    total++;
+                    const data = docSnap.data();
+
+                    const muni = data.municipio || "No especificado";
+                    contadoresMunicipio[muni] = (contadoresMunicipio[muni] || 0) + 1;
+
+                    const parro = data.parroquia || "No especificada";
+                    contadoresParroquia[parro] = (contadoresParroquia[parro] || 0) + 1;
+
+                    const consejo = data.consejoComunal || "No especificado";
+                    contadoresConsejo[consejo] = (contadoresConsejo[consejo] || 0) + 1;
+
+                    const circuito = data.circuitoComunal || "No especificado";
+                    contadoresCircuito[circuito] = (contadoresCircuito[circuito] || 0) + 1;
+
+                    const prof = data.profesion || "No especificada";
+                    contadoresProfesion[prof] = (contadoresProfesion[prof] || 0) + 1;
+
+                    const edad = parseInt(data.edad);
+                    if (!isNaN(edad)) {
+                        if (edad >= 18 && edad <= 29) contadoresEdad["18-29 años"]++;
+                        else if (edad >= 30 && edad <= 44) contadoresEdad["30-44 años"]++;
+                        else if (edad >= 45 && edad <= 59) contadoresEdad["45-59 años"]++;
+                        else if (edad >= 60) contadoresEdad["60+ años"]++;
+                        else contadoresEdad["No especificada"]++;
+                    } else {
+                        contadoresEdad["No especificada"]++;
+                    }
+                });
+
+                document.getElementById('totalGeneral').textContent = total;
+
+                // Renderizar Gráficos y Tablas para cada categoría
+                crearGraficoYTabla('chartMunicipio', 'tablaMunicipio', contadoresMunicipio, 'bar', '#3b82f6');
+                crearGraficoYTabla('chartParroquia', 'tablaParroquia', contadoresParroquia, 'bar', '#10b981');
+                crearGraficoYTabla('chartConsejoComunal', 'tablaConsejoComunal', contadoresConsejo, 'bar', '#f59e0b');
+                crearGraficoYTabla('chartCircuitoComunal', 'tablaCircuitoComunal', contadoresCircuito, 'bar', '#8b5cf6');
+                crearGraficoYTabla('chartProfesion', 'tablaProfesion', contadoresProfesion, 'bar', '#ec4899', 10);
+                crearGraficoYTabla('chartEdad', 'tablaEdad', contadoresEdad, 'doughnut', ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#94a3b8']);
+
+            } catch (error) {
+                console.error("Error al calcular estadísticas:", error);
+            }
+        }
+
+        function crearGraficoYTabla(canvasId, tablaId, objetoDatos, tipoGrafico, colores, limiteTop = null) {
+            let entradas = Object.entries(objetoDatos).sort((a, b) => b[1] - a[1]);
+            
+            // Llenar tabla
+            const tbody = document.getElementById(tablaId);
+            tbody.innerHTML = "";
+            if (entradas.length === 0 || (entradas.length === 1 && entradas[0][1] === 0)) {
+                tbody.innerHTML = `<tr><td colspan="2" class="p-2 text-center text-slate-400">Sin registros</td></tr>`;
+            } else {
+                entradas.forEach(([clave, valor]) => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50";
+                    tr.innerHTML = `<td class="p-2 font-medium text-slate-900">${clave}</td><td class="p-2 text-right font-bold text-blue-600">${valor}</td>`;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // Si hay límite (ej. Top 10 para profesiones largas), recortamos para el gráfico
+            let datosGrafico = entradas;
+            if (limiteTop && entradas.length > limiteTop) {
+                datosGrafico = entradas.slice(0, limiteTop);
+            }
+
+            // Renderizar gráfico con Chart.js
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const labels = datosGrafico.map(item => item[0]);
+            const values = datosGrafico.map(item => item[1]);
+
+            let configOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: tipoGrafico === 'doughnut', position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } },
+            };
+
+            if (tipoGrafico === 'bar') {
+                configOptions.scales = { y: { beginAtZero: true, ticks: { precision: 0 } } };
+            }
+
+            new Chart(ctx, {
+                type: tipoGrafico,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Cantidad',
+                        data: values,
+                        backgroundColor: colores,
+                        borderRadius: tipoGrafico === 'bar' ? 4 : 0
+                    }]
+                },
+                options: configOptions
+            });
+        }
+
+        calcularEstadisticas();
+    </script>
+</body>
+</html>
+
+```

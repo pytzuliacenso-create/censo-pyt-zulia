@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Registro - PYT Zulia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 min-h-screen py-10 px-4">
+    <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 border-b pb-4">
+            <div class="flex items-center gap-3">
+                <img src="descarga.jpeg" alt="Logo PYT" class="h-12 w-auto object-contain">
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-900">Registro en el Censo</h1>
+                    <p class="text-sm text-slate-500">Sistema de Profesionales y Técnicos - Estado Zulia</p>
+                </div>
+            </div>
+            <a href="dashboard.html" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-xl text-sm font-medium transition">
+                Volver al Panel
+            </a>
+        </div>
+
+        <form id="formCenso" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Nombre</label>
+                <input type="text" id="nombre" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Apellido</label>
+                <input type="text" id="apellido" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Cédula de Identidad</label>
+                <input type="text" id="cedula" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Teléfono</label>
+                <input type="text" id="telefono" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Fecha de Nacimiento</label>
+                <input type="date" id="fechaNacimiento" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Correo Electrónico</label>
+                <input type="email" id="correo" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Profesión</label>
+                <input type="text" id="profesion" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Nivel Académico</label>
+                <select id="nivelAcademico" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="TSU">TSU</option>
+                    <option value="Universitario">Universitario</option>
+                    <option value="Postgrado">Postgrado</option>
+                    <option value="Maestría / Doctorado">Maestría / Doctorado</option>
+                    <option value="Técnico Medio / Oficio">Técnico Medio / Oficio</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Casa de Estudios / Universidad</label>
+                <input type="text" id="universidad" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Gremio</label>
+                <input type="text" id="gremio" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-slate-700">Dirección</label>
+                <input type="text" id="direccion" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Estado</label>
+                <input type="text" id="estado" value="Zulia" readonly class="w-full mt-1 px-3 py-2 bg-slate-100 border rounded-lg text-slate-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Municipio</label>
+                <select id="municipio" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="Maracaibo">Maracaibo</option>
+                    <option value="San Francisco">San Francisco</option>
+                    <option value="Cabimas">Cabimas</option>
+                    <option value="Lagunillas">Lagunillas</option>
+                    <option value="Valmore Rodríguez">Valmore Rodríguez</option>
+                    <option value="Baralt">Baralt</option>
+                    <option value="Colón">Colón</option>
+                    <option value="Catatumbo">Catatumbo</option>
+                    <option value="Jesús María Semprún">Jesús María Semprún</option>
+                    <option value="Páez (Guajira)">Páez (Guajira)</option>
+                    <option value="Mara">Mara</option>
+                    <option value="Almirante Padilla">Almirante Padilla</option>
+                    <option value="Rosario de Perijá">Rosario de Perijá</option>
+                    <option value="Machiques de Perijá">Machiques de Perijá</option>
+                    <option value="La Cañada de Urdaneta">La Cañada de Urdaneta</option>
+                    <option value="Santa Rita">Santa Rita</option>
+                    <option value="Miranda">Miranda</option>
+                    <option value="Simón Bolívar">Simón Bolívar</option>
+                    <option value="Sucre">Sucre</option>
+                    <option value="Francisco Javier Pulgar">Francisco Javier Pulgar</option>
+                    <option value="Jesús Enrique Lossada">Jesús Enrique Lossada</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Parroquia</label>
+                <input type="text" id="parroquia" required class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Consejo Comunal</label>
+                <input type="text" id="consejoComunal" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Circuito Comunal</label>
+                <input type="text" id="circuitoComunal" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700">Pertenece a algún movimiento</label>
+                <input type="text" id="movimiento" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-slate-700">Responsabilidad en PYT Zulia</label>
+                <input type="text" id="responsabilidad" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="md:col-span-2 mt-6">
+                <button type="submit" id="btnGuardar" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow transition">
+                    Guardar Registro en el Censo
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Script de Firebase y Envío -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVP8spiI6h5JAGc4gT0qGo8t5t9hwn980",
+            authDomain: "censopytzulia.firebaseapp.com",
+            projectId: "censopytzulia",
+            storageBucket: "censopytzulia.firebasestorage.app",
+            messagingSenderId: "130010147895",
+            appId: "1:130010147895:web:f7e626c14b9577cfa1a3b2",
+            measurementId: "G-3P2LN48BWB"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const user = JSON.parse(localStorage.getItem('usuario_pyt'));
+        if (!user) {
+            window.location.href = "index.html";
+        }
+
+        const selectMunicipio = document.getElementById('municipio');
+        if (user.rol === 'municipal') {
+            selectMunicipio.value = user.municipio;
+            selectMunicipio.disabled = true;
+            selectMunicipio.classList.add("bg-slate-100", "text-slate-500");
+        }
+
+        document.getElementById('formCenso').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btnGuardar = document.getElementById('btnGuardar');
+            btnGuardar.disabled = true;
+            btnGuardar.textContent = "Guardando en la nube...";
+
+            const fechaNac = new Date(document.getElementById('fechaNacimiento').value);
+            const hoy = new Date();
+            let edad = hoy.getFullYear() - fechaNac.getFullYear();
+            const m = hoy.getMonth() - fechaNac.getMonth();
+            if (m < 0 || (m === 0 && hoy.getDate() < fechaNac.getDate())) {
+                edad--;
+            }
+
+            const nuevoRegistro = {
+                nombre: document.getElementById('nombre').value.trim(),
+                apellido: document.getElementById('apellido').value.trim(),
+                cedula: document.getElementById('cedula').value.trim(),
+                telefono: document.getElementById('telefono').value.trim(),
+                fechaNacimiento: document.getElementById('fechaNacimiento').value,
+                edad: edad,
+                correo: document.getElementById('correo').value.trim(),
+                profesion: document.getElementById('profesion').value.trim(),
+                nivelAcademico: document.getElementById('nivelAcademico').value,
+                universidad: document.getElementById('universidad').value.trim(),
+                gremio: document.getElementById('gremio').value.trim(),
+                direccion: document.getElementById('direccion').value.trim(),
+                estado: "Zulia",
+                municipio: selectMunicipio.value,
+                parroquia: document.getElementById('parroquia').value.trim(),
+                consejoComunal: document.getElementById('consejoComunal').value.trim(),
+                circuitoComunal: document.getElementById('circuitoComunal').value.trim(),
+                movimiento: document.getElementById('movimiento').value.trim(),
+                responsabilidad: document.getElementById('responsabilidad').value.trim(),
+                registradoPor: user.email,
+                fechaRegistro: serverTimestamp()
+            };
+
+            try {
+                await addDoc(collection(db, "censos_pyt"), nuevoRegistro);
+                alert("¡Registro guardado con éxito!");
+                window.location.href = "dashboard.html";
+            } catch (error) {
+                console.error("Error al guardar:", error);
+                alert("Hubo un error al registrar en la base de datos.");
+                btnGuardar.disabled = false;
+                btnGuardar.textContent = "Guardar Registro en el Censo";
+            }
+        });
+    </script>
+</body>
+</html>

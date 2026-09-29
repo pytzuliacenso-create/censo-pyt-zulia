@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Principal - PYT Zulia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            body { background: white; color: black; font-size: 10px; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            table { font-size: 9px; width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #cbd5e1; padding: 4px; text-align: left; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+    <!-- Barra Superior -->
+    <header class="bg-slate-900 text-white shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="descarga.jpeg" alt="Logo PYT" class="h-10 w-auto bg-white rounded-lg p-1 object-contain">
+                <div>
+                    <h1 class="text-xl font-bold">PYT Zulia - Censo Regional</h1>
+                    <p id="userInfo" class="text-xs text-slate-400">Cargando datos del usuario...</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 flex-wrap">
+                <a href="estadisticas.html" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-semibold transition">
+                    📊 Estadísticas
+                </a>
+                <button id="btnAbrirModalUsuarios" class="hidden bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg text-sm font-semibold transition">
+                    ⚙️ Usuarios
+                </button>
+                <a href="registro.html" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-semibold transition">
+                    + Nuevo Registro
+                </a>
+                <button id="btnCerrarSesion" class="bg-red-600/80 hover:bg-red-600 px-4 py-2 rounded-lg text-sm font-semibold transition">
+                    Salir
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Tarjetas de Estadísticas -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8 no-print">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <p class="text-sm font-medium text-slate-500">Total Registrados</p>
+                <p id="totalCensados" class="text-3xl font-extrabold text-slate-900 mt-1">0</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <p class="text-sm font-medium text-slate-500">Ámbito Asignado</p>
+                <p id="ambitoZona" class="text-xl font-bold text-blue-600 mt-1">-</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-500">Reporte General</p>
+                    <p class="text-xs text-slate-400 mt-1">Personaliza columnas e imprime</p>
+                </div>
+                <div class="mt-3">
+                    <button onclick="window.print()" class="w-full bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-xl text-xs font-semibold transition text-center">
+                        🖨️ Imprimir Reporte Seleccionado
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Selección de Columnas para Impresión (No se imprime) -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8 no-print">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 pb-2 border-b gap-2">
+                <div>
+                    <h3 class="font-bold text-slate-800 text-base">⚙️ Configurar Columnas del Reporte General a Imprimir</h3>
+                    <p class="text-xs text-slate-500">Selecciona los campos que deseas incluir en el documento impreso o PDF.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button type="button" id="btnMarcarTodos" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1 rounded-lg text-xs font-medium">Marcar Todos</button>
+                    <button type="button" id="btnDesmarcarTodos" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1 rounded-lg text-xs font-medium">Desmarcar Todos</button>
+                </div>
+            </div>
+            <div id="contenedorFiltrosImpresion" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 text-xs text-slate-700">
+                <!-- Se generan dinámicamente con JS -->
+            </div>
+        </div>
+
+        <!-- Encabezado exclusivo para Impresión -->
+        <div class="hidden print:block mb-6">
+            <h2 class="text-2xl font-bold">Reporte General Oficial de Censados - PYT Zulia</h2>
+            <p id="printMeta" class="text-sm text-slate-600 mb-4"></p>
+        </div>
+
+        <!-- Tabla Interactiva de Registros del Censo (Vista Web) -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden no-print">
+            <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <h3 class="font-bold text-slate-800">Registros del Censo</h3>
+                <div class="w-full sm:w-72">
+                    <input type="text" id="inputBuscador" placeholder="🔍 Buscar por cédula, nombre, profesión..." class="w-full px-3 py-2 text-sm border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
+                            <th class="p-4">Cédula</th>
+                            <th class="p-4">Nombre y Apellido</th>
+                            <th class="p-4">Profesión</th>
+                            <th class="p-4">Municipio</th>
+                            <th class="p-4">Parroquia</th>
+                            <th class="p-4">Teléfono</th>
+                            <th class="p-4 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaCensados" class="divide-y divide-slate-100 text-sm text-slate-700">
+                        <tr>
+                            <td colspan="7" class="p-6 text-center text-slate-400">Cargando registros desde la nube...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Contenedor exclusivo para Impresión (Tabla dinámica según selección) -->
+        <div class="hidden print:block space-y-6">
+            <div id="printReporteGeneralContainer">
+                <!-- Se llena dinámicamente -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Detalle Completo -->
+    <div id="modalDetalle" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-xl font-bold text-slate-900">Ficha Detallada del Censado</h3>
+                <button onclick="cerrarModalDetalle()" class="text-slate-400 hover:text-slate-600 font-bold text-2xl">&times;</button>
+            </div>
+            <div id="contenidoDetalle" class="space-y-3 text-sm text-slate-700">
+                <!-- Se llena dinámicamente -->
+            </div>
+            <div class="mt-6 flex justify-end gap-3 no-print">
+                <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-medium transition">
+                    Imprimir Ficha
+                </button>
+                <button onclick="cerrarModalDetalle()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-xl text-sm font-medium transition">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Gestión de Usuarios del Sistema -->
+    <div id="modalUsuarios" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50 no-print">
+        <div class="bg-white rounded-2xl max-w-4xl w-full p-6 max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-xl font-bold text-slate-900">Módulo de Gestión de Usuarios del Sistema</h3>
+                <button id="btnCerrarModal" class="text-slate-400 hover:text-slate-600 font-bold text-2xl">&times;</button>
+            </div>
+            <form id="formUsuarioSistema" class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <input type="hidden" id="editUserId">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700">Nombre Completo</label>
+                    <input type="text" id="sysNombre" required class="w-full mt-1 px-3 py-2 border rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700">Correo Electrónico</label>
+                    <input type="email" id="sysEmail" required class="w-full mt-1 px-3 py-2 border rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700">Contraseña</label>
+                    <input type="text" id="sysPassword" required class="w-full mt-1 px-3 py-2 border rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700">Rol de Usuario</label>
+                    <select id="sysRol" class="w-full mt-1 px-3 py-2 border rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="regional">Regional (Master)</option>
+                        <option value="municipal">Municipal</option>
+                    </select>
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-medium text-slate-700">Municipio (Obligatorio si es rol Municipal)</label>
+                    <select id="sysMunicipio" class="w-full mt-1 px-3 py-2 border rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Seleccione Municipio</option>
+                        <option value="Maracaibo">Maracaibo</option>
+                        <option value="San Francisco">San Francisco</option>
+                        <option value="Cabimas">Cabimas</option>
+                        <option value="Lagunillas">Lagunillas</option>
+                        <option value="Valmore Rodríguez">Valmore Rodríguez</option>
+                        <option value="Baralt">Baralt</option>
+                        <option value="Colón">Colón</option>
+                        <option value="Catatumbo">Catatumbo</option>
+                        <option value="Jesús María Semprún">Jesús María Semprún</option>
+                        <option value="Páez (Guajira)">Páez (Guajira)</option>
+                        <option value="Mara">Mara</option>
+                        <option value="Almirante Padilla">Almirante Padilla</option>
+                        <option value="Rosario de Perijá">Rosario de Perijá</option>
+                        <option value="Machiques de Perijá">Machiques de Perijá</option>
+                        <option value="La Cañada de Urdaneta">La Cañada de Urdaneta</option>
+                        <option value="Santa Rita">Santa Rita</option>
+                        <option value="Miranda">Miranda</option>
+                        <option value="Simón Bolívar">Simón Bolívar</option>
+                        <option value="Sucre">Sucre</option>
+                        <option value="Francisco Javier Pulgar">Francisco Javier Pulgar</option>
+                        <option value="Jesús Enrique Lossada">Jesús Enrique Lossada</option>
+                    </select>
+                </div>
+                <div class="sm:col-span-2 flex justify-end gap-2">
+                    <button type="button" id="btnCancelarEdicion" class="bg-slate-300 hover:bg-slate-400 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium hidden">Cancelar</button>
+                    <button type="submit" id="btnGuardarUsuario" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold">Guardar Usuario</button>
+                </div>
+            </form>
+            <h4 class="font-bold text-slate-800 mb-2">Usuarios Actuales del Sistema</h4>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-600 text-xs uppercase">
+                            <th class="p-3">Nombre</th>
+                            <th class="p-3">Correo</th>
+                            <th class="p-3">Rol</th>
+                            <th class="p-3">Municipio</th>
+                            <th class="p-3 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaUsuariosSistema" class="divide-y divide-slate-100 text-slate-700">
+                        <tr><td colspan="5" class="p-4 text-center text-slate-400">Cargando usuarios...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Principal -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, where, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVP8spiI6h5JAGc4gT0qGo8t5t9hwn980",
+            authDomain: "censopytzulia.firebaseapp.com",
+            projectId: "censopytzulia",
+            storageBucket: "censopytzulia.firebasestorage.app",
+            messagingSenderId: "130010147895",
+            appId: "1:130010147895:web:f7e626c14b9577cfa1a3b2",
+            measurementId: "G-3P2LN48BWB"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const user = JSON.parse(localStorage.getItem('usuario_pyt'));
+        if (!user) {
+            window.location.href = "index.html";
+        }
+
+        document.getElementById('userInfo').textContent = `${user.nombre} (${user.rol.toUpperCase()}) - ${user.email}`;
+        document.getElementById('ambitoZona').textContent = user.rol === 'regional' ? 'Estado Zulia (General)' : user.municipio;
+        document.getElementById('printMeta').textContent = `Generado por: ${user.email} | Zona: ${user.rol === 'regional' ? 'Todo el Estado Zulia' : user.municipio}`;
+
+        if (user.rol === 'regional') {
+            document.getElementById('btnAbrirModalUsuarios').classList.remove('hidden');
+        }
+
+        document.getElementById('btnCerrarSesion').addEventListener('click', () => {
+            localStorage.removeItem('usuario_pyt');
+            window.location.href = "index.html";
+        });
+
+        let listaCensadosGlobal = [];
+
+        // Definición de campos disponibles para el reporte general
+        const camposDisponibles = [
+            { id: 'municipio', label: 'Municipio', default: true },
+            { id: 'parroquia', label: 'Parroquia', default: true },
+            { id: 'cedula', label: 'Cédula', default: true },
+            { id: 'nombreCompleto', label: 'Nombres y Apellidos', default: true },
+            { id: 'telefono', label: 'Teléfono', default: true },
+            { id: 'correo', label: 'Correo', default: false },
+            { id: 'fechaNacimiento', label: 'Fecha Nac. / Edad', default: false },
+            { id: 'profesion', label: 'Profesión', default: true },
+            { id: 'nivelAcademico', label: 'Nivel Académico', default: false },
+            { id: 'universidad', label: 'Universidad', default: false },
+            { id: 'gremio', label: 'Gremio', default: false },
+            { id: 'estado', label: 'Estado', default: false },
+            { id: 'direccion', label: 'Dirección', default: false },
+            { id: 'consejoComunal', label: 'Consejo Comunal', default: false },
+            { id: 'circuitoComunal', label: 'Circuito Comunal', default: false },
+            { id: 'movimiento', label: 'Movimiento', default: false },
+            { id: 'responsabilidad', label: 'Responsabilidad PYT', default: false },
+            { id: 'registradoPor', label: 'Registrado Por', default: false }
+        ];
+
+        // Inicializar los checkboxes en el panel de configuración
+        function inicializarFiltrosImpresion() {
+            const contenedor = document.getElementById('contenedorFiltrosImpresion');
+            contenedor.innerHTML = "";
+            camposDisponibles.forEach(campo => {
+                const label = document.createElement('label');
+                label.className = "flex items-center gap-2 cursor-pointer bg-slate-50 p-2 rounded-lg border border-slate-200 hover:bg-slate-100 transition";
+                label.innerHTML = `
+                    <input type="checkbox" value="${campo.id}" ${campo.default ? 'checked' : ''} class="check-columna rounded text-blue-600 focus:ring-blue-500">
+                    <span class="font-medium">${campo.label}</span>
+                `;
+                contenedor.appendChild(label);
+            });
+
+            document.querySelectorAll('.check-columna').forEach(chk => {
+                chk.addEventListener('change', () => renderizarReporteGeneralImpresion(listaCensadosGlobal));
+            });
+        }
+
+        document.getElementById('btnMarcarTodos').addEventListener('click', () => {
+            document.querySelectorAll('.check-columna').forEach(chk => chk.checked = true);
+            renderizarReporteGeneralImpresion(listaCensadosGlobal);
+        });
+
+        document.getElementById('btnDesmarcarTodos').addEventListener('click', () => {
+            document.querySelectorAll('.check-columna').forEach(chk => chk.checked = false);
+            renderizarReporteGeneralImpresion(listaCensadosGlobal);
+        });
+
+        async function cargarDatos() {
+            const tbody = document.getElementById('tablaCensados');
+            const totalCensados = document.getElementById('totalCensados');
+
+            try {
+                let q;
+                if (user.rol === 'regional') {
+                    q = collection(db, "censos_pyt");
+                } else {
+                    q = query(collection(db, "censos_pyt"), where("municipio", "==", user.municipio));
+                }
+
+                const querySnapshot = await getDocs(q);
+                listaCensadosGlobal = [];
+                
+                querySnapshot.forEach((docSnap) => {
+                    listaCensadosGlobal.push({ id: docSnap.id, ...docSnap.data() });
+                });
+
+                // Ordenar alfabéticamente por Municipio
+                listaCensadosGlobal.sort((a, b) => {
+                    const muniA = (a.municipio || "").trim().toLowerCase();
+                    const muniB = (b.municipio || "").trim().toLowerCase();
+                    if (muniA < muniB) return -1;
+                    if (muniA > muniB) return 1;
+                    return (a.nombre || "").localeCompare(b.nombre || "");
+                });
+
+                renderizarTabla(listaCensadosGlobal);
+                renderizarReporteGeneralImpresion(listaCensadosGlobal);
+                totalCensados.textContent = listaCensadosGlobal.length;
+
+            } catch (error) {
+                console.error("Error al cargar censados:", error);
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-red-500">Error al obtener los datos de Firebase.</td></tr>`;
+            }
+        }
+
+        function renderizarTabla(datos) {
+            const tbody = document.getElementById('tablaCensados');
+            tbody.innerHTML = "";
+
+            if (datos.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No se encontraron registros.</td></tr>`;
+                return;
+            }
+
+            datos.forEach((data) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="p-4 font-medium text-slate-900">${data.cedula || 'N/D'}</td>
+                    <td class="p-4">${data.nombre} ${data.apellido}</td>
+                    <td class="p-4">${data.profesion}</td>
+                    <td class="p-4">${data.municipio}</td>
+                    <td class="p-4">${data.parroquia}</td>
+                    <td class="p-4">${data.telefono}</td>
+                    <td class="p-4 text-center no-print">
+                        <button onclick='verDetalle(${JSON.stringify(data)})' class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow transition">
+                            👁️ Ver Detalle
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Generar tabla de impresión general basada en los checkboxes seleccionados
+        function renderizarReporteGeneralImpresion(datos) {
+            const container = document.getElementById('printReporteGeneralContainer');
+            container.innerHTML = "";
+
+            const checksActivos = Array.from(document.querySelectorAll('.check-columna:checked')).map(chk => chk.value);
+
+            if (checksActivos.length === 0) {
+                container.innerHTML = `<p class="text-center text-red-500 font-bold p-4">⚠️ No ha seleccionado ninguna columna para imprimir en el reporte general.</p>`;
+                return;
+            }
+
+            let html = `
+                <h3 class="text-lg font-bold mb-3 text-slate-900 border-b pb-1">Listado General (Ordenado Alfabéticamente por Municipio)</h3>
+                <table class="w-full text-left border-collapse text-[9px]">
+                    <thead>
+                        <tr class="bg-slate-200 text-slate-900 uppercase">
+            `;
+
+            checksActivos.forEach(colId => {
+                const campoObj = camposDisponibles.find(c => c.id === colId);
+                html += `<th class="p-2 border">${campoObj ? campoObj.label : colId}</th>`;
+            });
+
+            html += `
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            if (datos.length === 0) {
+                html += `<tr><td colspan="${checksActivos.length}" class="p-4 text-center text-slate-500">No hay registros disponibles.</td></tr>`;
+            } else {
+                datos.forEach((item) => {
+                    html += `<tr class="border-b">`;
+                    checksActivos.forEach(colId => {
+                        let valor = 'N/D';
+                        if (colId === 'nombreCompleto') {
+                            valor = `${item.nombre || ''} ${item.apellido || ''}`.trim() || 'N/D';
+                        } else if (colId === 'fechaNacimiento') {
+                            valor = `${item.fechaNacimiento || 'N/D'} (${item.edad || 'N/D'}a)`;
+                        } else {
+                            valor = item[colId] || 'N/D';
+                        }
+                        html += `<td class="p-2 border">${valor}</td>`;
+                    });
+                    html += `</tr>`;
+                });
+            }
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+            container.innerHTML = html;
+        }
+
+        // Buscador en tiempo real
+        document.getElementById('inputBuscador').addEventListener('input', (e) => {
+            const texto = e.target.value.toLowerCase();
+            const filtrados = listaCensadosGlobal.filter(item => 
+                (item.cedula && item.cedula.toLowerCase().includes(texto)) ||
+                (item.nombre && item.nombre.toLowerCase().includes(texto)) ||
+                (item.apellido && item.apellido.toLowerCase().includes(texto)) ||
+                (item.profesion && item.profesion.toLowerCase().includes(texto)) ||
+                (item.municipio && item.municipio.toLowerCase().includes(texto)) ||
+                (item.parroquia && item.parroquia.toLowerCase().includes(texto))
+            );
+            renderizarTabla(filtrados);
+        });
+
+        // Ver Detalle
+        window.verDetalle = function(data) {
+            const contenedor = document.getElementById('contenidoDetalle');
+            contenedor.innerHTML = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div><strong class="text-slate-900">Cédula:</strong> ${data.cedula || 'N/D'}</div>
+                    <div><strong class="text-slate-900">Nombres y Apellidos:</strong> ${data.nombre} ${data.apellido}</div>
+                    <div><strong class="text-slate-900">Teléfono:</strong> ${data.telefono || 'N/D'}</div>
+                    <div><strong class="text-slate-900">Correo:</strong> ${data.correo || 'N/D'}</div>
+                    <div><strong class="text-slate-900">Fecha de Nacimiento:</strong> ${data.fechaNacimiento || 'N/D'} (${data.edad || 'N/D'} años)</div>
+                    <div><strong class="text-slate-900">Profesión:</strong> ${data.profesion || 'N/D'}</div>
+                    <div><strong class="text-slate-900">Nivel Académico:</strong> ${data.nivelAcademico || 'N/D'}</div>
+                    <div><strong class="text-slate-900">Universidad:</strong> ${data.universidad || 'N/D'}</div>
+                    <div><strong class="text-slate-900">Gremio:</strong> ${data.gremio || 'N/D'}</div>
+                    <div><strong class="text-slate-900">Estado:</strong> ${data.estado || 'Zulia'}</div>
+                    <div><strong class="text-slate-900">Municipio:</strong> ${data.municipio || 'N/D'}</div>
+                    <div><strong class="text-slate-900">Parroquia:</strong> ${data.parroquia || 'N/D'}</div>
+                    <div class="sm:col-span-2"><strong class="text-slate-900">Dirección:</strong> ${data.direccion || 'N/D'}</div>
+                    <div><strong class="text-slate-900">Consejo Comunal:</strong> ${data.consejoComunal || 'N/D'}</div>
+                    <div><strong class="text-slate-900">Circuito Comunal:</strong> ${data.circuitoComunal || 'N/D'}</div>
+                    <div><strong class="text-slate-900">Movimiento:</strong> ${data.movimiento || 'N/D'}</div>
+                    <div><strong class="text-slate-900">Responsabilidad PYT:</strong> ${data.responsabilidad || 'N/D'}</div>
+                    <div class="sm:col-span-2 text-xs text-slate-400 mt-2 border-t pt-2">Registrado por: ${data.registradoPor || 'N/D'}</div>
+                </div>
+            `;
+            document.getElementById('modalDetalle').classList.remove('hidden');
+        }
+
+        window.cerrarModalDetalle = function() {
+            document.getElementById('modalDetalle').classList.add('hidden');
+        }
+
+        // Ejecutar inicializaciones
+        inicializarFiltrosImpresion();
+        cargarDatos();
+
+        // Lógica de gestión de usuarios del sistema
+        const modalUsuarios = document.getElementById('modalUsuarios');
+        document.getElementById('btnAbrirModalUsuarios')?.addEventListener('click', () => {
+            modalUsuarios.classList.remove('hidden');
+            cargarUsuariosSistema();
+        });
+        document.getElementById('btnCerrarModal').addEventListener('click', () => {
+            modalUsuarios.classList.add('hidden');
+            limpiarFormularioUsuario();
+        });
+
+        async function cargarUsuariosSistema() {
+            const tbody = document.getElementById('tablaUsuariosSistema');
+            tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Cargando usuarios...</td></tr>`;
+            try {
+                const querySnapshot = await getDocs(collection(db, "usuarios_sistema"));
+                tbody.innerHTML = "";
+                if (querySnapshot.empty) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No hay usuarios registrados.</td></tr>`;
+                    return;
+                }
+                querySnapshot.forEach((docSnap) => {
+                    const uData = docSnap.data();
+                    const uId = docSnap.id;
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50";
+                    tr.innerHTML = `
+                        <td class="p-3 font-medium">${uData.nombre || 'N/D'}</td>
+                        <td class="p-3">${uData.email}</td>
+                        <td class="p-3 uppercase text-xs font-bold text-blue-600">${uData.rol}</td>
+                        <td class="p-3">${uData.municipio || 'N/A (Regional)'}</td>
+                        <td class="p-3 text-center space-x-2">
+                            <button onclick="editarUsuario('${uId}', '${uData.nombre || ''}', '${uData.email}', '${uData.password}', '${uData.rol}', '${uData.municipio || ''}')" class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded text-xs">Editar</button>
+                            <button onclick="eliminarUsuario('${uId}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs">Eliminar</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error("Error al cargar usuarios:", error);
+            }
+        }
+
+        document.getElementById('formUsuarioSistema').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('editUserId').value;
+            const nombre = document.getElementById('sysNombre').value.trim();
+            const email = document.getElementById('sysEmail').value.trim();
+            const password = document.getElementById('sysPassword').value.trim();
+            const rol = document.getElementById('sysRol').value;
+            const municipio = rol === 'municipal' ? document.getElementById('sysMunicipio').value : '';
+
+            if (rol === 'municipal' && !municipio) {
+                alert('Debe seleccionar un municipio.');
+                return;
+            }
+            const datosUsuario = { nombre, email, password, rol, municipio };
+            try {
+                if (editId) {
+                    await updateDoc(doc(db, "usuarios_sistema", editId), datosUsuario);
+                    alert("¡Usuario actualizado!");
+                } else {
+                    await addDoc(collection(db, "usuarios_sistema"), datosUsuario);
+                    alert("¡Usuario creado!");
+                }
+                limpiarFormularioUsuario();
+                cargarUsuariosSistema();
+            } catch (error) {
+                console.error("Error al guardar usuario:", error);
+            }
+        });
+
+        window.editarUsuario = function(id, nombre, email, password, rol, municipio) {
+            document.getElementById('editUserId').value = id;
+            document.getElementById('sysNombre').value = nombre;
+            document.getElementById('sysEmail').value = email;
+            document.getElementById('sysPassword').value = password;
+            document.getElementById('sysRol').value = rol;
+            document.getElementById('sysMunicipio').value = municipio;
+            document.getElementById('btnGuardarUsuario').textContent = "Actualizar";
+            document.getElementById('btnCancelarEdicion').classList.remove('hidden');
+        }
+
+        window.eliminarUsuario = async function(id) {
+            if (confirm("¿Eliminar usuario?")) {
+                try {
+                    await deleteDoc(doc(db, "usuarios_sistema", id));
+                    cargarUsuariosSistema();
+                } catch (error) {
+                    console.error("Error al eliminar:", error);
+                }
+            }
+        }
+
+        function limpiarFormularioUsuario() {
+            document.getElementById('formUsuarioSistema').reset();
+            document.getElementById('editUserId').value = "";
+            document.getElementById('btnGuardarUsuario').textContent = "Guardar Usuario";
+            document.getElementById('btnCancelarEdicion').classList.add('hidden');
+        }
+        document.getElementById('btnCancelarEdicion')?.addEventListener('click', limpiarFormularioUsuario);
+    </script>
+</body>
+</html>
+
+```
