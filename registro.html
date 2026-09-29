@@ -115,6 +115,10 @@
                 <input type="text" id="circuitoComunal" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div>
+                <label class="block text-sm font-medium text-slate-700">Centro de Votación</label>
+                <input type="text" id="centroVotacion" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
                 <label class="block text-sm font-medium text-slate-700">Pertenece a algún movimiento</label>
                 <input type="text" id="movimiento" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
             </div>
@@ -193,6 +197,7 @@
                 parroquia: document.getElementById('parroquia').value.trim(),
                 consejoComunal: document.getElementById('consejoComunal').value.trim(),
                 circuitoComunal: document.getElementById('circuitoComunal').value.trim(),
+                centroVotacion: document.getElementById('centroVotacion').value.trim(),
                 movimiento: document.getElementById('movimiento').value.trim(),
                 responsabilidad: document.getElementById('responsabilidad').value.trim(),
                 registradoPor: user.email,

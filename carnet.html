@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credencial Oficial - PYT Zulia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Librería para generar códigos QR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        /* Tamaño exacto de tarjeta de crédito (CR80: 85.6mm x 54mm) */
+        .card-cr80 {
+            width: 85.6mm;
+            height: 54mm;
+        }
+
+        @media print {
+            body { 
+                background: white; 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact; 
+            }
+            .no-print { display: none !important; }
+            .print-area { 
+                display: flex !important; 
+                justify-content: center; 
+                align-items: center; 
+                height: 100vh; 
+                margin: 0; 
+            }
+            #carnetCard { 
+                box-shadow: none !important; 
+                border: 1px solid #cbd5e1 !important; 
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen py-8 px-4">
+
+    <!-- Barra de Navegación superior (No se imprime) -->
+    <div class="max-w-xl mx-auto mb-6 flex justify-between items-center no-print">
+        <a href="dashboard.html" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-xl text-sm font-medium transition">
+            &larr; Volver al Panel
+        </a>
+        <h1 class="text-lg font-bold text-slate-800">Generador de Credencial (Tamaño Tarjeta)</h1>
+    </div>
+
+    <!-- Buscador y Carga de Foto Local (No se imprime) -->
+    <div class="max-w-xl mx-auto bg-white rounded-2xl shadow-md p-5 mb-6 border border-slate-200 no-print space-y-3">
+        <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">1. Buscar Censado por Cédula</label>
+            <div class="flex gap-2">
+                <input type="text" id="inputCedulaBuscar" placeholder="Ingrese Cédula..." class="flex-1 px-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                <button id="btnBuscarCensado" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition">
+                    Buscar
+                </button>
+            </div>
+        </div>
+
+        <div id="panelFotoLocal" class="pt-2 border-t hidden">
+            <label class="block text-xs font-bold text-slate-700 mb-1">2. Adjuntar Fotografía (Local para impresión):</label>
+            <input type="file" id="inputFotoLocal" accept="image/*" class="w-full text-xs border p-1.5 rounded-xl bg-slate-50">
+        </div>
+    </div>
+
+    <!-- Contenedor con Medidas de Tarjeta de Crédito (CR80) -->
+    <main class="print-area flex justify-center items-center">
+        <div id="carnetCard" class="card-cr80 bg-white rounded-xl shadow-2xl overflow-hidden border border-slate-300 relative flex flex-col justify-between p-2.5 box-border">
+            
+            <!-- Franja Superior Institucional -->
+            <div class="absolute top-0 left-0 right-0 h-11 bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 z-0"></div>
+            
+            <!-- Logo y Membrete Superior -->
+            <div class="relative z-10 flex items-center justify-between text-white">
+                <div class="flex items-center gap-1.5">
+                    <img src="descarga.jpeg" alt="Logo PYT" class="h-6 w-6 bg-white rounded-full p-0.5 object-contain shadow">
+                    <div class="text-left leading-tight">
+                        <p class="text-[6px] font-bold tracking-wider uppercase opacity-80">Estado Zulia</p>
+                        <p class="text-[9px] font-extrabold">Profesionales y Técnicos</p>
+                    </div>
+                </div>
+                <div class="text-right leading-tight">
+                    <span class="bg-blue-600 text-white text-[7px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Credencial</span>
+                    <p id="codigoValidacion" class="text-[6px] font-mono text-blue-200 mt-0.5">VAL: PENDIENTE</p>
+                </div>
+            </div>
+
+            <!-- Cuerpo Central (Foto + Datos + QR) -->
+            <div class="relative z-10 flex items-center gap-2 mt-1.5">
+                <!-- Fotografía Local -->
+                <div class="flex-shrink-0">
+                    <div class="h-20 w-16 rounded-lg border border-slate-300 shadow-sm overflow-hidden bg-slate-100 flex items-center justify-center">
+                        <img id="carnetFoto" src="" alt="Foto" class="h-full w-full object-cover hidden">
+                        <span id="carnetFotoPlaceholder" class="text-[8px] text-slate-400 font-medium text-center px-0.5">Sin Foto</span>
+                    </div>
+                </div>
+
+                <!-- Datos Personales Compactos -->
+                <div class="flex-1 text-left space-y-0.5 min-w-0">
+                    <div>
+                        <h2 id="carnetNombre" class="text-[10px] font-black text-slate-900 truncate leading-tight">Nombre y Apellido</h2>
+                        <p id="carnetProfesion" class="text-[8px] font-bold text-blue-600 uppercase truncate">Profesión</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-x-1 gap-y-0.5 text-[7px] text-slate-700 bg-slate-50 p-1.5 rounded-lg border border-slate-100 leading-tight">
+                        <div><strong>Cédula:</strong> <span id="carnetCedula">V-0000</span></div>
+                        <div><strong>Tel:</strong> <span id="carnetTelefono">N/D</span></div>
+                        <div><strong>Nivel:</strong> <span id="carnetNivel">N/D</span></div>
+                        <div><strong>Muni:</strong> <span id="carnetMunicipio">N/D</span></div>
+                        <div><strong>Parr:</strong> <span id="carnetParroquia">N/D</span></div>
+                        <div><strong>Centro:</strong> <span id="carnetCentro" class="truncate block">N/D</span></div>
+                    </div>
+                </div>
+
+                <!-- Código QR Compacto -->
+                <div class="flex-shrink-0 flex flex-col items-center justify-center bg-slate-50 p-1 rounded-lg border border-slate-200">
+                    <div id="qrcode" class="w-[45px] h-[45px] flex items-center justify-center"></div>
+                    <span class="text-[6px] text-slate-500 font-bold uppercase mt-0.5">QR</span>
+                </div>
+            </div>
+
+            <!-- Pie de Tarjeta -->
+            <div class="relative z-10 border-t border-slate-100 pt-0.5 flex justify-between items-center text-[6px] text-slate-400">
+                <span>PYT Zulia - Gremial Oficial</span>
+                <span id="carnetResponsabilidad" class="truncate max-w-[120px]">Resp: N/D</span>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Botón de Impresión -->
+    <div class="max-w-xl mx-auto mt-6 text-center no-print">
+        <button onclick="window.print()" class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg text-sm transition">
+            🖨️ Imprimir Credencial (Tamaño Tarjeta)
+        </button>
+    </div>
+
+    <!-- Script de Firebase y Lógica -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVP8spiI6h5JAGc4gT0qGo8t5t9hwn980",
+            authDomain: "censopytzulia.firebaseapp.com",
+            projectId: "censopytzulia",
+            storageBucket: "censopytzulia.firebasestorage.app",
+            messagingSenderId: "130010147895",
+            appId: "1:130010147895:web:f7e626c14b9577cfa1a3b2",
+            measurementId: "G-3P2LN48BWB"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        function generarQR(texto) {
+            const container = document.getElementById('qrcode');
+            container.innerHTML = "";
+            try {
+                new QRCode(container, {
+                    text: texto,
+                    width: 45,
+                    height: 45,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } catch (error) {
+                console.error("Error generando QR:", error);
+            }
+        }
+
+        // Buscar datos en Firestore
+        document.getElementById('btnBuscarCensado').addEventListener('click', async () => {
+            const cedulaBuscada = document.getElementById('inputCedulaBuscar').value.trim();
+            if (!cedulaBuscada) {
+                alert("Por favor ingrese un número de cédula.");
+                return;
+            }
+
+            try {
+                const q = query(collection(db, "censos_pyt"), where("cedula", "==", cedulaBuscada));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    alert("No se encontró ningún registro con esa cédula.");
+                    return;
+                }
+
+                let data = null;
+                querySnapshot.forEach((docSnap) => {
+                    data = docSnap.data();
+                });
+
+                // Código alfanumérico único
+                const hashAleatorio = Math.random().toString(36).substring(2, 7).toUpperCase();
+                const codigoVal = `PYT-${data.cedula}-${hashAleatorio}`;
+                document.getElementById('codigoValidacion').textContent = `VAL: ${codigoVal}`;
+
+                // Rellenar campos ajustados al tamaño compacto
+                document.getElementById('carnetNombre').textContent = `${data.nombre || ''} ${data.apellido || ''}`;
+                document.getElementById('carnetProfesion').textContent = data.profesion || 'Profesional';
+                document.getElementById('carnetCedula').textContent = data.cedula || 'N/D';
+                document.getElementById('carnetTelefono').textContent = data.telefono || 'N/D';
+                document.getElementById('carnetNivel').textContent = data.nivelAcademico || 'N/D';
+                document.getElementById('carnetMunicipio').textContent = data.municipio || 'N/D';
+                document.getElementById('carnetParroquia').textContent = data.parroquia || 'N/D';
+                document.getElementById('carnetCentro').textContent = data.centroVotacion || 'N/D';
+                document.getElementById('carnetResponsabilidad').textContent = `Resp: ${data.responsabilidad || 'N/D'}`;
+
+                // Mostrar panel para cargar la foto local
+                document.getElementById('panelFotoLocal').classList.remove('hidden');
+
+                // Formato optimizado para el QR
+                const infoQR = `PYT-ZULIA|Val:${codigoVal}|CI:${data.cedula}|Nom:${data.nombre} ${data.apellido}|Prof:${data.profesion}|Mun:${data.municipio}|Tel:${data.telefono}`;
+                generarQR(infoQR);
+
+            } catch (error) {
+                console.error("Error al buscar:", error);
+                alert("Ocurrió un error al consultar la base de datos.");
+            }
+        });
+
+        // Cargar foto local
+        document.getElementById('inputFotoLocal').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const imgTag = document.getElementById('carnetFoto');
+                    const placeholderTag = document.getElementById('carnetFotoPlaceholder');
+                    
+                    imgTag.src = event.target.result;
+                    imgTag.classList.remove('hidden');
+                    placeholderTag.classList.add('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>

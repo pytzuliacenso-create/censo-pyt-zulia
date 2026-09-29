@@ -22,7 +22,7 @@
             <div class="flex items-center gap-3">
                 <img src="descarga.jpeg" alt="Logo PYT" class="h-10 w-auto bg-white rounded-lg p-1 object-contain">
                 <div>
-                    <h1 class="text-xl font-bold">PYT Zulia - Censo Regional</h1>
+                    <h1 class="text-xl font-bold">PYT Zulia - Registro Regional</h1>
                     <p id="userInfo" class="text-xs text-slate-400">Cargando datos del usuario...</p>
                 </div>
             </div>
@@ -30,8 +30,11 @@
                 <a href="estadisticas.html" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-semibold transition">
                     📊 Estadísticas
                 </a>
+                <a href="carnet.html" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-semibold transition">
+                    🪪 Credencial
+                </a>
                 <button id="btnAbrirModalUsuarios" class="hidden bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg text-sm font-semibold transition">
-                    ⚙️ Usuarios
+                    ⚙️️ Usuarios
                 </button>
                 <a href="registro.html" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-semibold transition">
                     + Nuevo Registro
@@ -244,6 +247,10 @@
                     <input type="text" id="editCircuitoComunal" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
+                    <label class="block text-sm font-medium text-slate-700">Centro de Votación</label>
+                    <input type="text" id="editCentroVotacion" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
                     <label class="block text-sm font-medium text-slate-700">Pertenece a algún movimiento</label>
                     <input type="text" id="editMovimiento" class="w-full mt-1 px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
@@ -393,6 +400,7 @@
             { id: 'direccion', label: 'Dirección', default: false },
             { id: 'consejoComunal', label: 'Consejo Comunal', default: false },
             { id: 'circuitoComunal', label: 'Circuito Comunal', default: false },
+            { id: 'centroVotacion', label: 'Centro de Votación', default: false },
             { id: 'movimiento', label: 'Movimiento', default: false },
             { id: 'responsabilidad', label: 'Responsabilidad PYT', default: false },
             { id: 'registradoPor', label: 'Registrado Por', default: false }
@@ -476,18 +484,16 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition";
                 
-                // Botones base: Ver detalle siempre disponible
                 let botonesAcciones = `
                     <button onclick='verDetalle(${JSON.stringify(data)})' class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow transition">
                         👁️ Ver Detalle
                     </button>
                 `;
 
-                // Botones de Editar y Eliminar solo para rol regional (Master)
                 if (user.rol === 'regional') {
                     botonesAcciones += `
                         <button onclick='abrirEditarCenso(${JSON.stringify(data)})' class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow transition ml-1">
-                            ✏️ Editar
+                            ✏ Editar
                         </button>
                         <button onclick='eliminarCenso("${data.id}")' class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow transition ml-1">
                             🗑️ Eliminar
@@ -591,6 +597,7 @@
                     <div class="sm:col-span-2"><strong class="text-slate-900">Dirección:</strong> ${data.direccion || 'N/D'}</div>
                     <div><strong class="text-slate-900">Consejo Comunal:</strong> ${data.consejoComunal || 'N/D'}</div>
                     <div><strong class="text-slate-900">Circuito Comunal:</strong> ${data.circuitoComunal || 'N/D'}</div>
+                    <div><strong class="text-slate-900">Centro de Votación:</strong> ${data.centroVotacion || 'N/D'}</div>
                     <div><strong class="text-slate-900">Movimiento:</strong> ${data.movimiento || 'N/D'}</div>
                     <div><strong class="text-slate-900">Responsabilidad PYT:</strong> ${data.responsabilidad || 'N/D'}</div>
                     <div class="sm:col-span-2 text-xs text-slate-400 mt-2 border-t pt-2">Registrado por: ${data.registradoPor || 'N/D'}</div>
@@ -621,6 +628,7 @@
             document.getElementById('editParroquia').value = data.parroquia || '';
             document.getElementById('editConsejoComunal').value = data.consejoComunal || '';
             document.getElementById('editCircuitoComunal').value = data.circuitoComunal || '';
+            document.getElementById('editCentroVotacion').value = data.centroVotacion || '';
             document.getElementById('editMovimiento').value = data.movimiento || '';
             document.getElementById('editResponsabilidad').value = data.responsabilidad || '';
 
@@ -661,6 +669,7 @@
                 parroquia: document.getElementById('editParroquia').value.trim(),
                 consejoComunal: document.getElementById('editConsejoComunal').value.trim(),
                 circuitoComunal: document.getElementById('editCircuitoComunal').value.trim(),
+                centroVotacion: document.getElementById('editCentroVotacion').value.trim(),
                 movimiento: document.getElementById('editMovimiento').value.trim(),
                 responsabilidad: document.getElementById('editResponsabilidad').value.trim()
             };
